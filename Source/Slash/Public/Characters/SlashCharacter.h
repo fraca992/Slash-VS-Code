@@ -9,6 +9,9 @@
 
 class UInputMappingContext;
 class UInputAction;
+class USpringArmComponent;
+class UCameraComponent;
+class UGroomComponent;
 
 UCLASS()
 class SLASH_API ASlashCharacter : public ACharacter
@@ -28,6 +31,21 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = Input)
 	UInputAction* MovementAction;
+	UPROPERTY(EditAnywhere, Category = Input)
+	UInputAction* LookAction;
 
 	void Move(const FInputActionValue& Value);
+	void Look(const FInputActionValue& Value);
+
+private:
+	UPROPERTY(VisibleAnywhere)
+	USpringArmComponent* CameraBoom;
+
+	UPROPERTY(VisibleAnywhere)
+	UCameraComponent* ViewCamera;
+
+	UPROPERTY(VisibleAnywhere, Category = Hair)
+	UGroomComponent* Hair;
+	UPROPERTY(VisibleAnywhere, Category = Hair)
+	UGroomComponent* Eyebrows;
 };

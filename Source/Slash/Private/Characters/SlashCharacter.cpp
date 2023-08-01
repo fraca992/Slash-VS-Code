@@ -2,6 +2,10 @@
 
 
 #include "Characters/SlashCharacter.h"
+#include "GameFramework/SpringArmComponent.h"
+#include "Camera/CameraComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "GroomComponent.h"
 
 #include "Components/InputComponent.h"
 #include "EnhancedInputSubsystems.h"
@@ -11,6 +15,27 @@ ASlashCharacter::ASlashCharacter()
 {
  	PrimaryActorTick.bCanEverTick = true;
 
+	bUseControllerRotationPitch = false;
+	bUseControllerRotationRoll = false;
+	bUseControllerRotationYaw = false;
+
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+	GetCharacterMovement()->RotationRate = FRotator(0.f, 400.f, 0.f);
+
+	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
+	CameraBoom->SetupAttachment(GetRootComponent());
+	CameraBoom->TargetArmLength = 300.f;
+
+	ViewCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("ViewCamera"));
+	ViewCamera->SetupAttachment(CameraBoom);
+
+	Hair = CreateDefaultSubobject<UGroomComponent>(TEXT("Hair"));
+	Hair->SetupAttachment(GetMesh());
+	Hair->AttachmentName = FString("head");
+
+	Eyebrows = CreateDefaultSubobject<UGroomComponent>(TEXT("Eyebrows"));
+	Eyebrows->SetupAttachment(GetMesh());
+	Eyebrows->AttachmentName = FString("head");
 }
 
 void ASlashCharacter::BeginPlay()
@@ -32,12 +57,25 @@ void ASlashCharacter::Move(const FInputActionValue& Value)
 	const FVector2D MovementVector = Value.Get<FVector2D>();
 
 	if ((GetController()) && (!MovementVector.IsZero()))
-	{
-		FVector Forward = GetActorForwardVector();
-		AddMovementInput(Forward, MovementVector.Y);
+	{	
+		const FRotator ControlRotation = GetControlRotation();
+		const FRotator YawRotation(0.f, ControlRotation.Yaw, 0.f);
 
-		FVector Right = GetActorRightVector();
-		AddMovementInput(Right, MovementVector.X);
+		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+		AddMovementInput(ForwardDirection, MovementVector.Y);
+		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+		AddMovementInput(RightDirection, MovementVector.X);
+	}
+}
+
+void ASlashCharacter::Look(const FInputActionValue& Value)
+{
+	const FVector2D LookAxisVector = Value.Get<FVector2D>();
+
+	if ((GetController()) && (!LookAxisVector.IsZero()))
+	{
+		AddControllerYawInput(LookAxisVector.X);
+		AddControllerPitchInput(LookAxisVector.Y);
 	}
 }
 
@@ -54,6 +92,7 @@ void ASlashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
 	{
 		EnhancedInputComponent->BindAction(MovementAction, ETriggerEvent::Triggered, this, &ASlashCharacter::Move);
+		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ASlashCharacter::Look);
 	}
 }
 
