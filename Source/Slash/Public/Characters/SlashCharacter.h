@@ -4,15 +4,19 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "InputActionValue.h"
+#include "InputActionValue.h" // ok, it's a light header file
+#include "CharacterTypes.h" // ok, it's a light header file
 #include "SlashCharacter.generated.h"
 
+// for new Input system
 class UInputMappingContext;
 class UInputAction;
+
 class USpringArmComponent;
 class UCameraComponent;
 class UGroomComponent;
 class AItem;
+
 
 UCLASS()
 class SLASH_API ASlashCharacter : public ACharacter
@@ -44,6 +48,8 @@ protected:
 	void EKeyPressed();
 
 private:
+	ECharacterState CharacterState = ECharacterState::ECS_Unequipped;
+
 	UPROPERTY(VisibleAnywhere)
 	USpringArmComponent* CameraBoom;
 
@@ -61,5 +67,5 @@ private:
 
 public:
 	FORCEINLINE void SetOverlappingItem(AItem* Item) { OverlappingItem = Item; }
-
+	FORCEINLINE ECharacterState GetCharacterState() const { return CharacterState; }
 };
