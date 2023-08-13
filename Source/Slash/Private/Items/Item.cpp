@@ -3,6 +3,7 @@
 #include "Items/Item.h"
 #include "Slash/DebugMacros.h"
 #include "Components/SphereComponent.h"
+#include "Characters/SlashCharacter.h"
 
 AItem::AItem()
 {
@@ -21,6 +22,7 @@ void AItem::BeginPlay()
 
 	// binding the OnSphereOverlap function to OnComponentBeginOverlap delegate
 	Sphere->OnComponentBeginOverlap.AddDynamic(this, &AItem::OnSphereOverlap);
+	Sphere->OnComponentEndOverlap.AddDynamic(this, &AItem::OnSphereEndOverlap);
 }
 
 void AItem::Tick(float DeltaTime)
@@ -43,10 +45,20 @@ float AItem::TransformedCos()
 
 void AItem::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	const FString OtherActorName = OtherActor->GetName();
+	ASlashCharacter* SlashCharacter = Cast<ASlashCharacter>(OtherActor);
 
-	if (GEngine)
+	if (SlashCharacter)
 	{
-		GEngine->AddOnScreenDebugMessage(1, 30.f, FColor::Red, OtherActorName);
+		SlashCharacter->SetOverlappingItem(this);
+	}
+}
+
+void AItem::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	ASlashCharacter* SlashCharacter = Cast<ASlashCharacter>(OtherActor);
+
+	if (SlashCharacter)
+	{
+		SlashCharacter->SetOverlappingItem(nullptr);
 	}
 }
