@@ -42,10 +42,13 @@ protected:
 	UInputAction* JumpAction;
 	UPROPERTY(EditAnywhere, Category = Input)
 	UInputAction* EKeyPressedAction;
+	UPROPERTY(EditAnywhere, Category = Input)
+	UInputAction* AttackAction;
 
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 	void EKeyPressed();
+	void Attack();
 
 private:
 	ECharacterState CharacterState = ECharacterState::ECS_Unequipped;
