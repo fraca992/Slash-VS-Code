@@ -59,6 +59,10 @@ protected:
 	*/
 	void PlayAttackMontage();
 
+	UFUNCTION(BlueprintCallable)
+	void AttackEnd();
+	bool CanAttack();
+
 private:
 	ECharacterState CharacterState = ECharacterState::ECS_Unequipped;
 
