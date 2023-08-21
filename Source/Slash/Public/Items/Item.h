@@ -8,6 +8,12 @@
 
 class USphereComponent;
 
+enum class EItemState : uint8
+{
+	EIS_Hovering,
+	EIS_Equipped
+};
+
 UCLASS()
 class SLASH_API AItem : public AActor
 {
@@ -34,6 +40,8 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UStaticMeshComponent* ItemMesh;
+
+	EItemState ItemState = EItemState::EIS_Hovering;
 
 	UFUNCTION() // has to be UFUNCTION() to add to reflection system to allow binding
 	virtual void OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
