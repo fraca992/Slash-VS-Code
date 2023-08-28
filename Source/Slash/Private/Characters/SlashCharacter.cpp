@@ -97,12 +97,26 @@ void ASlashCharacter::EKeyPressed()
 
 	AWeapon* OverlappingWeapon = Cast<AWeapon>(OverlappingItem);
 
-	if (OverlappingWeapon)
+	if (OverlappingWeapon && !EquippedWeapon)
 	{
 		OverlappingWeapon->Equip(GetMesh(), FName("RightHandSocket"));
 		CharacterState = ECharacterState::ECS_EquippedOneHandedWeapon; // for now, only handling One-Handed weapons
+		OverlappingItem = nullptr;
+		EquippedWeapon = OverlappingWeapon;
 	}
-
+	else
+	{
+		if (CanDisarm())
+		{
+			PlayEquipMontage(FName("Unequip"));
+			CharacterState = ECharacterState::ECS_Unequipped;
+		}
+		else if (CanArm())
+		{
+			PlayEquipMontage(FName("Equip"));
+			CharacterState = ECharacterState::ECS_EquippedOneHandedWeapon;
+		}
+	}
 }
 
 void ASlashCharacter::Attack()
@@ -114,10 +128,29 @@ void ASlashCharacter::Attack()
 	}
 }
 
+void ASlashCharacter::AttackEnd()
+{
+	ActionState = EActionState::EAS_Unoccupied;
+}
+
 bool ASlashCharacter::CanAttack()
 {
 	return ActionState == EActionState::EAS_Unoccupied
 		&& CharacterState != ECharacterState::ECS_Unequipped;
+}
+
+bool ASlashCharacter::CanDisarm()
+{
+	return ActionState == EActionState::EAS_Unoccupied &&
+		CharacterState != ECharacterState::ECS_Unequipped &&
+		EquippedWeapon;
+}
+
+bool ASlashCharacter::CanArm()
+{
+	return ActionState == EActionState::EAS_Unoccupied &&
+		CharacterState == ECharacterState::ECS_Unequipped &&
+		EquippedWeapon;
 }
 
 void ASlashCharacter::PlayAttackMontage()
@@ -144,9 +177,14 @@ void ASlashCharacter::PlayAttackMontage()
 	}
 }
 
-void ASlashCharacter::AttackEnd()
+void ASlashCharacter::PlayEquipMontage(FName SectionName)
 {
-	ActionState = EActionState::EAS_Unoccupied;
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance && EquipMontage)
+	{
+		AnimInstance->Montage_Play(EquipMontage);
+		AnimInstance->Montage_JumpToSection(SectionName, EquipMontage);
+	}
 }
 
 void ASlashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
