@@ -9,6 +9,7 @@
 #include "Items/Item.h"
 #include "Items/Weapons/Weapon.h"
 #include "Animation/AnimMontage.h"
+#include "Components/BoxComponent.h"
 
 // for new Input system
 #include "Components/InputComponent.h"
@@ -60,6 +61,14 @@ void ASlashCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void ASlashCharacter::SetWeaponCollision(ECollisionEnabled::Type CollisionType)
+{
+	if(EquippedWeapon && EquippedWeapon->GetWeaponBox())
+	{
+		EquippedWeapon->GetWeaponBox()->SetCollisionEnabled(CollisionType);
+	}
 }
 
 void ASlashCharacter::Move(const FInputActionValue& Value)
@@ -226,4 +235,3 @@ void ASlashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &ASlashCharacter::Attack);
 	}
 }
-
