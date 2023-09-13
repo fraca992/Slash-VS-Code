@@ -31,6 +31,10 @@ private:
 	UPROPERTY(EditAnywhere, Category = Sounds)
 	USoundBase* HitSound;
 
+	// Particle System (Cascades)
+	UPROPERTY(EditAnywhere, Category = VisualEffects)
+	UParticleSystem* HitParticles;
+
 protected:
 	virtual void BeginPlay() override;
 
