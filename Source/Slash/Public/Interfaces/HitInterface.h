@@ -22,5 +22,6 @@ class SLASH_API IHitInterface
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-	virtual void GetHit(const FVector& ImpactPoint) = 0; //avoid making a copy with a reference, more efficient
+	UFUNCTION(BlueprintNativeEvent) // instead of virtual function, we use BlueprintNativeEvent so we can implement both c++ and blueprint. This will create a virtual function called GetHit_Implementation. To then call this function in c++ we use Execute_GetHit()
+	void GetHit(const FVector& ImpactPoint); //avoid making a copy with a reference, more efficient
 };
