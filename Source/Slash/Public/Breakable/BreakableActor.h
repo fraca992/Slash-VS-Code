@@ -23,7 +23,16 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-private:
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BLueprintReadWrite)
 	UGeometryCollectionComponent* GeometryCollection;
+
+	UPROPERTY(VisibleAnywhere, BLueprintReadWrite)
+	class UCapsuleComponent* Capsule;
+
+private:
+	// adding the UPROPERTY(EditAnywhere) to UClass* allows us to pass the Blueprint class into the spawn actor method by assigning it in the BP_BreakableActor
+	UPROPERTY(EditAnywhere, Category = "Breakable Properties")
+	TArray<TSubclassOf<class ATreasure>> TreasureClasses;
+
+	bool bBroken = false;
 };
